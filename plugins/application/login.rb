@@ -14,6 +14,7 @@ class MCollective::Application::Login<MCollective::Application
 
     user = h.ask("User Name: ")
     pass = h.ask("Password: ") {|q| q.echo = "*"}
+    puts "Performing two factor authentication against webservice and duo security...."
 
     uri = URI("http://localhost:9292/authenticate")
 

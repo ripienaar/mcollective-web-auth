@@ -4,11 +4,10 @@ require 'rubygems'
 require 'sinatra'
 require 'pp'
 require 'mcollective'
-
-SALT = "Roophoojaegooviechoniegeelaejo"
+require 'duo-rest'
 
 helpers do
-def protected!
+  def protected!
     unless authorized?
       response['WWW-Authenticate'] = %(Basic realm="Restricted Area")
       throw(:halt, [401, "Not authorized\n"])
@@ -17,7 +16,7 @@ def protected!
 
   def authorized?
     @auth ||=  Rack::Auth::Basic::Request.new(request.env)
-    @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == ['admin', 'admin']
+    @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == ['rip', 'secret']
   end
 
   def authenticated_user
@@ -54,7 +53,6 @@ get '/encrypt' do
       throw(:halt, [500, "Please supply a request message time"]) unless params[:msgtime]  # TTLs and msgtime go together
       throw(:halt, [500, "Please supply a request hash"]) unless params[:hash]             # a md5 of the request being approved
                                                                                            # an attacker cant change the request post auth
-
       ssl = MCollective::SSL.new(nil, "/home/rip/.mcollective.d/rip-private.pem")
 
       signed = ssl.sign({"requestid" => params[:requestid],
@@ -82,9 +80,20 @@ get '/authenticate' do
   valid_to = (valid_from + 3600)
   user = authenticated_user
 
-  token = MCollective::SSL.uuid("#{SALT}#{user}#{valid_from.to_i}#{valid_to.to_i}")
+  token = MCollective::SSL.uuid
 
   open("/tmp/tokens/#{token}.txt", "w") {|f| f.puts("%s,%s,%s,%s" % [valid_from.to_i, valid_to.to_i, user, token]) }
 
-  {"token" => token, "valid_till" => valid_to.to_i}.to_json
+  duo_creds = YAML.load_file("duo_creds.yaml")
+
+  duo = DuoRest::Connection.new(duo_creds["host"], duo_creds["integration"], duo_creds["secret"])
+
+  duo_auth = duo.auth(user, "push1")
+
+  # {"stat"=>"OK", "response"=>{"status"=>"Success. Logging you in...", "result"=>"allow"}}
+  if duo_auth["stat"] == "OK" && duo_auth["response"]["result"] == "allow"
+    {"token" => token, "valid_till" => valid_to.to_i}.to_json
+  else
+    "not authorized"
+  end
 end
