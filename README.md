@@ -42,6 +42,7 @@ Shortcomings of the POC
  * Does not use SSL
  * Lots of hard coded paths and so forth, this really is just for demoing
  * Registration does not work
+ * Stores tokens on disk in /tmp, obvious bad idea - needs to go in proper storage when finally implemented
  * Long running MC clients must be able to use their own certs and authorize their own requests so for monitoring the webservice is not a SPOF
 
 The last 2 items are related, it will need the ability that if the 
