@@ -38,6 +38,7 @@ all Auditing and Authorization done by mcollective
 Shortcomings of the POC
 =======================
 
+ * Does not use the duo security pre-auth step and has no enrolement, only supports duo push
  * Does not use SSL
  * Registration does not work
  * Long running MC clients must be able to use their own certs and authorize their own requests so for monitoring the webservice is not a SPOF
