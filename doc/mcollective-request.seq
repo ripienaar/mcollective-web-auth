@@ -1,0 +1,10 @@
+// http://interactive.blockdiag.com/seqdiag/
+{
+  user -> mcollective
+  mcollective -> webservice [label="submit raw request and token" note="validates token"]
+  mcollective <-- webservice [label="signed hash, encrypted user"]
+
+  mcollective -> activemq [label="publishes request"]
+  mcollective <-- activemq [label="receive replies"]
+  user <-- mcollective [label="display results"]
+}

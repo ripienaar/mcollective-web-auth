@@ -1,0 +1,19 @@
+// http://interactive.blockdiag.com/seqdiag/
+{
+  user -> webservice [label = "Login Request"];
+  webservice -> duo [label = "Request Preauth"];
+  webservice <-- duo;
+  user <-- webservice [note = "Preauth Details"];
+
+  === Pre Auth ===
+
+  user -> webservice [label = "Auth method choice" leftnote = "Prompt user for auth choice"];
+  webservice -> duo [label = "Request Duo authentication"];
+  webservice <-- duo [label = "User logged in"];
+
+  === Duo Auth Passed ===
+
+  user <-- webservice [label = "auth token" note="Our internal token"];
+
+  user -> user [label = "save auth token"];
+}
