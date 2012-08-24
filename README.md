@@ -3,6 +3,9 @@ What?
 
 A very basic two factor authentication service for mcollective.
 
+*This is a proof of concept to demonstrate the basic design of
+such a system and not for wider use just yet.*
+
 A webservice runs centrally and has a private key.  Users log
 into the webservice and authenticates using duo security:
 
@@ -32,5 +35,24 @@ a certificate file name or unix user but to whatever the webservice
 declares the user name is.  This username is used throughout in
 all Auditing and Authorization done by mcollective
 
-*This is a proof of concept to demonstrate the basic design of
-such a system and not for wider use just yet.*
+Shortcomings of the POC
+=======================
+
+ * Does not use SSL
+ * Registration does not work
+ * Long running MC clients must be able to use their own certs and authorize their own requests so for monitoring the webservice is not a SPOF
+
+The last 2 items are related, it will need the ability that if the 
+client specifies it has it's own private key then it should not rely
+on the webservice for auth.  On the servers you would just put the
+public key for these hosts in addition to the one of the webservice.
+
+Authorization plugins will still work as always, thus just restrict 
+this new certificate to the monitoring related agents.
+
+Future Ideas
+============
+
+Past the POC the following can be done:
+
+ * Submit the whole request to the webservice, do central RBAC by just not signing requests that does not pass RBAC
