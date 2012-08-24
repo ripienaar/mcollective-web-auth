@@ -40,6 +40,7 @@ Shortcomings of the POC
 
  * Does not use the duo security pre-auth step and has no enrolement, only supports duo push
  * Does not use SSL
+ * Lots of hard coded paths and so forth, this really is just for demoing
  * Registration does not work
  * Long running MC clients must be able to use their own certs and authorize their own requests so for monitoring the webservice is not a SPOF
 
